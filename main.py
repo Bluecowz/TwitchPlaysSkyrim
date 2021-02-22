@@ -13,6 +13,8 @@ from pynput.mouse import Button, Controller as MouseController
 # TODO varaible mouse movement?
 # TODO logging 
 # TODO Filter none command messages
+# TODO Remove magic numbers for mouse
+# TODO Have long and short versions for commands
 ###
 
 mouse = MouseController()
