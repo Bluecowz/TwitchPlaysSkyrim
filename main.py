@@ -6,9 +6,10 @@ import getopt
 import os
 from enum import Enum
 from pynput.keyboard import Key, Controller as KeyboardController
-from pynput.mouse import Button, Controller as MouseController
+from pynput.mouse import Button, Controller as MouseController, Listener
 
 ### TODOS
+# TODO Fix the damn mouse input
 # TODO Enum for commands 
 # TODO varaible mouse movement?
 # TODO logging 
@@ -24,128 +25,156 @@ logging.basicConfig(level=logging.DEBUG,
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
 
+def on_move(x,y):
+    print("print('Pointer moved to {0}".format((x,y)))
+
+
 def ParseCommand(message):
+    MOUSE_STEP=100
     message = message.replace('\r', '')
-    if message == 'rm': # Click Right Mouse
+    commands = re.search('([a-zA-Z]*)([0-9]*)',message)
+    if commands is None:
+        return
+    command, value = commands.groups()
+    print('Parsing: ' + command)
+    if command == 'rm': # Click Right Mouse
         mouse.press(Button.right)
         mouse.release(Button.right)
-    elif message == 'hrm': # Hold Right Mouse
+    elif command == 'hrm': # Hold Right Mouse
         mouse.press(Button.right)
-    elif message == 'rrm': # Release Right Mouse
+    elif command == 'rrm': # Release Right Mouse
         mouse.release(Button.right)
-    elif message == 'lm': # Click Left Mouse
+    elif command == 'lm': # Click Left Mouse
         mouse.press(Button.left)
         mouse.release(Button.left)
-    elif message == 'hlm': # Hold Left Mouse
+    elif command == 'hlm': # Hold Left Mouse
         mouse.press(Button.left)
-    elif message == 'rlm': # Release Left Mouse
+    elif command == 'rlm': # Release Left Mouse
         mouse.release(Button.left)
-    elif message == 'mup':
-        mouse.move(0,-60)
-    elif message == 'mdown':
-        mouse.move(0,60)
-    elif message == 'mleft':
-        mouse.move(-60, 0)
-    elif message == 'mright':
-        mouse.move(60,0)
-    elif message == 'halt': # Hold Alt
+    elif command == 'mup':
+        mouse.position = (1,1)
+        if value != '':
+            mouse.move(0,-int(value))
+        else:
+            mouse.move(0,-MOUSE_STEP)
+    elif command == 'mdown':
+        mouse.position = (1,1)
+        if value != '':
+            mouse.move(0,int(value))
+        else:
+            mouse.move(0,MOUSE_STEP)
+    elif command == 'mleft':
+        mouse.position = (1,1)
+        if value != '':
+            mouse.move(-int(value), 0)
+        else:
+            mouse.move(-MOUSE_STEP, 0)
+    elif command == 'mright':
+        mouse.position = (1,1)
+        if value != '':
+            mouse.move(int(value), 0)
+        else:    
+            mouse.move(MOUSE_STEP,0)
+    elif command == 'reset_mouse':
+        mouse.position = (1,1)
+    elif command == 'halt': # Hold Alt
         keyboard.press(Key.alt)
-    elif message == 'ralt': # Release Alt
+    elif command == 'ralt': # Release Alt
         keyboard.release(Key.alt)
-    elif message == "Z": # Press Z
+    elif command == "Z": # Press Z
         keyboard.press('z')
         keyboard.release('z')
-    elif message == 'w': # Press W
+    elif command == 'w': # Press W
         keyboard.press('w')
         keyboard.release('w')
-    elif message == 's': # Press S
+    elif command == 's': # Press S
         keyboard.press('s')
         keyboard.release('s')
-    elif message == 'a': # Press A
+    elif command == 'a': # Press A
         keyboard.press('a')
         keyboard.release('a')
-    elif message == 'd': # Press D
+    elif command == 'd': # Press D
         keyboard.press('d')
         keyboard.release('d')
-    elif message == 'hw': # Hold W
+    elif command == 'hw': # Hold W
         keyboard.press('w')
-    elif message == 'ha': # Hold A
+    elif command == 'ha': # Hold A
         keyboard.press('a')
-    elif message == 'hs': # Hold S
+    elif command == 'hs': # Hold S
         keyboard.press('s')
-    elif message == 'hd': # Hold D
+    elif command == 'hd': # Hold D
         keyboard.press('d')
-    elif message == 'rw': # Release W
+    elif command == 'rw': # Release W
         keyboard.release('w')
-    elif message == 'ra': # Release A
+    elif command == 'ra': # Release A
         keyboard.release('a')
-    elif message == 'rs': # Release S
+    elif command == 'rs': # Release S
         keyboard.release('s')
-    elif message == 'rd': # Release D
+    elif command == 'rd': # Release D
         keyboard.release('d')
-    elif message == 'ctrl': # Press Ctrl
+    elif command == 'ctrl': # Press Ctrl
         keyboard.press(Key.ctrl)
         keyboard.release(Key.ctrl)
-    elif message == 'f':  # Press F (to pay respect?)
+    elif command == 'f':  # Press F (to pay respect?)
         keyboard.press('f')
         keyboard.release('f')
-    elif message == 'clock': # Press Caps Lock
+    elif command == 'clock': # Press Caps Lock
         keyboard.press(Key.caps_lock)
         keyboard.release(Key.caps_lock)
-    elif message == 't': # Press T
+    elif command == 't': # Press T
         keyboard.press('t')
         keyboard.release('t') 
-    elif message == 'j': # Press J
+    elif command == 'j': # Press J
         keyboard.press('j')
         keyboard.release('j')
-    elif message == 'e': # Press E
+    elif command == 'e': # Press E
         keyboard.press('e')
         keyboard.release('e')
-    elif message == 'tab': # Press Tab
+    elif command == 'tab': # Press Tab
         keyboard.press(Key.tab)
         keyboard.release(Key.tab)
-    elif message == 'r': # Press R
+    elif command == 'r': # Press R
         keyboard.press('r')
         keyboard.release('r')
-    elif message == 'space': # Press Space
+    elif command == 'space': # Press Space
         keyboard.press(Key.space)
         keyboard.release(Key.space)
-    elif message == 'he': # Hold E
+    elif command == 'he': # Hold E
         keyboard.press('e')
-    elif message == 're': # Release E
+    elif command == 're': # Release E
         keyboard.release('re')
-    elif message == 'q': # Press Q
+    elif command == 'q': # Press Q
         keyboard.press('q')
         keyboard.release('q')
-    elif message == 'esc': # Press Escape
+    elif command == 'esc': # Press Escape
         keyboard.press(Key.esc)
         keyboard.release(Key.esc)
-    elif message == 'f5': # Press F5
+    elif command == 'f5': # Press F5
         keyboard.press(Key.f5)
         keyboard.release(Key.f5)
-    elif message == 'up': # Press Up
+    elif command == 'up': # Press Up
         keyboard.press(Key.up)
         keyboard.release(Key.up)
-    elif message == 'down': # Press Down
+    elif command == 'down': # Press Down
         keyboard.press(Key.down)
         keyboard.press(Key.down)
-    elif message == 'left': # Press Left
+    elif command == 'left': # Press Left
         keyboard.press(Key.left)
         keyboard.release(Key.left)
-    elif message == 'right': # Press Right
+    elif command == 'right': # Press Right
         keyboard.press(Key.right)
         keyboard.release(Key.right)
-    elif message == 'hshift': # Hold Shift
+    elif command == 'hshift': # Hold Shift
         keyboard.press(Key.shift_l)
-    elif message == 'rshift': # Release Shift
+    elif command == 'rshift': # Release Shift
         keyboard.release(Key.shift_l)
-    elif message == 'enter': # Press Enter
+    elif command == 'enter': # Press Enter
         keyboard.press(Key.enter)
         keyboard.release(Key.enter)
-    elif message == 'moo': #Test Command
+    elif command == 'moo': #Test Command
         print('Said The Blue Cow')
     else:
-        print('Not A Recognized command: ' + message)
+        print('Not A Recognized command: ' + command)
 
 def main(argv):
     server = 'irc.chat.twitch.tv'
@@ -175,6 +204,9 @@ def main(argv):
     sock.send(f"NICK {nickname}\n".encode('utf-8'))
     sock.send(f"JOIN {channel}\n".encode('utf-8'))
 
+    listener = Listener(on_move=on_move)
+    # listener.start()
+
     try:
         print('Beginning command parsing...')
         while True:
@@ -191,6 +223,9 @@ def main(argv):
     except KeyboardInterrupt:
         sock.close()
         print('Socket Closed')
+    except ConnectionError:
+        sock.close()
+        print('Connection Error')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
