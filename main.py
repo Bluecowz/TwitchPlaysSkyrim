@@ -31,7 +31,7 @@ def on_move(x,y):
     print("print('Pointer moved to {0}".format((x,y)))
 
 
-def ParseCommand(message,channel):
+def ParseCommand(message):
     MOUSE_STEP=100
     message = message.replace('\r', '')
     commands = re.search('([a-zA-Z]*)([0-9]*)',message)
@@ -236,7 +236,7 @@ def main(argv):
                 if fmtre is not None:
                     username, channel, message = fmtre.groups()
                     # print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
-                    ParseCommand(message,channel)
+                    ParseCommand(message)
     except KeyboardInterrupt:
         sock.close()
         print('Socket Closed')
