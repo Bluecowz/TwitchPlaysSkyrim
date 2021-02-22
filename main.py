@@ -4,9 +4,16 @@ import re
 import sys
 import getopt
 import os
+from enum import Enum
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
-# from you import YourMom as PogChamp
+
+### TODOS
+# TODO Enum for commands 
+# TODO varaible mouse movement?
+# TODO logging 
+# TODO Filter none command messages
+###
 
 mouse = MouseController()
 keyboard = KeyboardController()
@@ -17,7 +24,6 @@ logging.basicConfig(level=logging.DEBUG,
 
 def ParseCommand(message):
     message = message.replace('\r', '')
-    print('Parsing Command: ' + message)
     if message == 'rm': # Click Right Mouse
         mouse.press(Button.right)
         mouse.release(Button.right)
@@ -136,6 +142,8 @@ def ParseCommand(message):
         keyboard.release(Key.enter)
     elif message == 'moo': #Test Command
         print('Said The Blue Cow')
+    else:
+        print('Not A Recognized command: ' + message)
 
 def main(argv):
     server = 'irc.chat.twitch.tv'
