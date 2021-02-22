@@ -18,6 +18,7 @@ from pynput.mouse import Button, Controller as MouseController, Listener
 # TODO Have long and short versions for commands
 ###
 
+MOUSE_STEP=100
 sock = socket.socket()
 mouse = MouseController()
 keyboard = KeyboardController()
@@ -29,14 +30,7 @@ logging.basicConfig(level=logging.DEBUG,
 def on_move(x,y):
     print("print('Pointer moved to {0}".format((x,y)))
 
-def ParseCommand(message,username, channel):
-    MOUSE_STEP=100
-    message = message.replace('\r', '')
-    commands = re.search('([a-zA-Z]*)([0-9]*)',message)
-    if commands is None:
-        return
-    command, value = commands.groups()
-    print('Parsing: ' + command)
+def ParseCommand(command,value,username, channel):
     if command == Commands.RIGHT_MOUSE: # Click Right Mouse
         mouse.press(Button.right)
         time.sleep(0.3)
@@ -190,7 +184,7 @@ def ParseCommand(message,username, channel):
         keyboard.release(Key.alt)
     elif command == Commands.MOO: #Test Command
         print('Said The Blue Cow')
-    logging.debug("{}:{}:{}".format(channel,username,message))
+
 
 def main(argv):
     server = 'irc.chat.twitch.tv'
@@ -221,6 +215,8 @@ def main(argv):
     listener = Listener(on_move=on_move)
     # listener.start()
 
+    Command_List = [item.value for item in Commands]
+
     try:
         print('Beginning command parsing...')
         while True:
@@ -231,9 +227,14 @@ def main(argv):
             elif len(resp) > 0:
                 fmtre = re.search(':(.*)\!.*@.*\.tmi\.twitch\.tv PRIVMSG #(.*) :(.*)', resp)
                 if fmtre is not None:
-                    username, channel, message = fmtre.groups()
+                    username, channel, message = fmtre.groups()    
+                    message = message.replace('\r', '')
                     # print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
-                    ParseCommand(message, username, channel)
+                    if message in Command_List:
+                        commands = re.search('([a-zA-Z]*)([0-9]*)',message)
+                        command, value = commands.groups()
+                        ParseCommand(command, value, username, channel)
+                        logging.debug("{}:{}:{}:{}".format(channel,username,command,value))
     except KeyboardInterrupt:
         sock.close()
         print('Socket Closed')
