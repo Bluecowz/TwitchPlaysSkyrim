@@ -12,6 +12,8 @@ The chat commands are built around the idea that a user would want to do one of 
 
 This formatting of commands might be confusing at first and feedback on how to improve them would be fantastic. I also want to add more verbose command names people could use instead, for example, if you want to hold the e button a user could type "he" or "Hold E". 
 
+Mouse movements can be give an arguement for how far to move. The mouse movement is... finicky. If not specified a step is supplied. 
+
 # Command Table
 
 | Command | What You Want To Do |
@@ -23,9 +25,13 @@ This formatting of commands might be confusing at first and feedback on how to i
 | hlm | Hold Left Mouse Button |
 | rlm | Release Left Mouse Button |
 | mup | Move The Mouse Up |
+| mupX | Move The Mouse Up X pixels. Ex: mup600 |
 | mdown | Move The Mouse Down |
+| mdownX | Move The Mouse Down X pixels. Ex: mdown600 |
 | mleft | Move The Mouse Left |
+| mleftX | Move The Mouse Left X pixels. Ex: mleft600 |
 | mright | Move The Mouse Right |
+| mrightX | Move The Mouse Right X pixels. Ex: mright600 |
 | halt | Hold Alt |
 | ralt | Release Alt |
 | z | Press Z |
@@ -70,5 +76,10 @@ This formatting of commands might be confusing at first and feedback on how to i
 # Yup
 
 Skyrim Controls can be found here: https://elderscrolls.fandom.com/wiki/Controls_(Skyrim)
+ 
 
-I think thats it. 
+# Whats Next?
+
+Refine it maybe? 
+
+I would like to be able to load configs and play multiple games thought the same script.

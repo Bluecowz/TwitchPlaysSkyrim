@@ -11,10 +11,6 @@ from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController, Listener
 
 ### TODOS
-# TODO logging 
-# TODO make pretty readme for commands
-# TODO Enum for commands 
-# TODO Filter none command messages
 # TODO Have long and short versions for commands
 ###
 
