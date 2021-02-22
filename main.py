@@ -1,30 +1,14 @@
-import socket, logging
-import 
+import socket 
+import logging
 import re
 import sys
+import getopt
 import os
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
+# from you import YourMom as PogChamp
 
-server = 'irc.chat.twitch.tv'
-port = 6667
-nickname = 'InputBoi'
-token = os.getenv('twitch_token')
-channel = '#bluecowz'
 
-mouse = MouseController()
-keyboard = KeyboardController()
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(message)s',
-                    datefmt='%Y-%m-%d_%H:%M:%S',
-                    handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
-
-sock = socket.socket()
-sock.connect((server, port))
-
-sock.send(f"PASS {token}\n".encode('utf-8'))
-sock.send(f"NICK {nickname}\n".encode('utf-8'))
-sock.send(f"JOIN {channel}\n".encode('utf-8'))
 
 def ParseCommand(message):
     message = message.replace('\r', '')
@@ -140,22 +124,59 @@ def ParseCommand(message):
     elif message == 'moo': #Test Command
         print('Said The Blue Cow')
 
-try:
-    while True:
-        resp = sock.recv(2048).decode('utf-8')
+def main(argv):
+    server = 'irc.chat.twitch.tv'
+    port = 6667
+    nickname = 'InputBoi'
+    token = os.getenv('twitch_token')
+    channel = ''
+    mouse = MouseController()
+    keyboard = KeyboardController()
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(message)s',
+                        datefmt='%Y-%m-%d_%H:%M:%S',
+                        handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
 
-        if resp.startswith('PING'):
-            sock.send("PONG\n".encode('utf-8'))
-        elif len(resp) > 0:
-            fmtre = re.search(':(.*)\!.*@.*\.tmi\.twitch\.tv PRIVMSG #(.*) :(.*)', resp)
-            if fmtre is not None:
-                username, channel, message = fmtre.groups()
-                print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
-                ParseCommand(message)
-except KeyboardInterrupt:
-    sock.close()
-    print('Socket Closed')
+    try:
+        opts, args = getopt.getopt(argv, "hc:",["channel="])
+    except getopt.GetoptError:
+        print('main.py -c <channel>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('main.py -c <channel>')
+            sys.exit()
+        elif opt in ('-c', '--channel'):
+            channel = '#' + arg
 
+    print('Connection to channel ' + channel)
+    sock = socket.socket()
+    sock.connect((server, port))
+    print('Connected!')
+
+    sock.send(f"PASS {token}\n".encode('utf-8'))
+    sock.send(f"NICK {nickname}\n".encode('utf-8'))
+    sock.send(f"JOIN {channel}\n".encode('utf-8'))
+
+    try:
+        print('Beginning command parsing...')
+        while True:
+            resp = sock.recv(2048).decode('utf-8')
+
+            if resp.startswith('PING'):
+                sock.send("PONG\n".encode('utf-8'))
+            elif len(resp) > 0:
+                fmtre = re.search(':(.*)\!.*@.*\.tmi\.twitch\.tv PRIVMSG #(.*) :(.*)', resp)
+                if fmtre is not None:
+                    username, channel, message = fmtre.groups()
+                    # print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
+                    ParseCommand(message)
+    except KeyboardInterrupt:
+        sock.close()
+        print('Socket Closed')
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 
 
 
