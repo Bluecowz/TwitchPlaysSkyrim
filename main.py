@@ -4,6 +4,7 @@ import re
 import sys
 import getopt
 import os
+import time
 from enum import Enum
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController, Listener
@@ -18,6 +19,7 @@ from pynput.mouse import Button, Controller as MouseController, Listener
 # TODO Have long and short versions for commands
 ###
 
+sock = socket.socket()
 mouse = MouseController()
 keyboard = KeyboardController()
 logging.basicConfig(level=logging.DEBUG,
@@ -29,7 +31,7 @@ def on_move(x,y):
     print("print('Pointer moved to {0}".format((x,y)))
 
 
-def ParseCommand(message):
+def ParseCommand(message,channel):
     MOUSE_STEP=100
     message = message.replace('\r', '')
     commands = re.search('([a-zA-Z]*)([0-9]*)',message)
@@ -39,6 +41,7 @@ def ParseCommand(message):
     print('Parsing: ' + command)
     if command == 'rm': # Click Right Mouse
         mouse.press(Button.right)
+        time.sleep(0.3)
         mouse.release(Button.right)
     elif command == 'hrm': # Hold Right Mouse
         mouse.press(Button.right)
@@ -46,6 +49,7 @@ def ParseCommand(message):
         mouse.release(Button.right)
     elif command == 'lm': # Click Left Mouse
         mouse.press(Button.left)
+        time.sleep(0.3)
         mouse.release(Button.left)
     elif command == 'hlm': # Hold Left Mouse
         mouse.press(Button.left)
@@ -75,8 +79,6 @@ def ParseCommand(message):
             mouse.move(int(value), 0)
         else:    
             mouse.move(MOUSE_STEP,0)
-    elif command == 'reset_mouse':
-        mouse.position = (1,1)
     elif command == 'halt': # Hold Alt
         keyboard.press(Key.alt)
     elif command == 'ralt': # Release Alt
@@ -136,13 +138,19 @@ def ParseCommand(message):
     elif command == 'r': # Press R
         keyboard.press('r')
         keyboard.release('r')
+    elif command == 'l': # Press L
+        keyboard.press('l')
+        keyboard.release('l')
+    elif command == 'm': # Press M
+        keyboard.press('m')
+        keyboard.release('m')
     elif command == 'space': # Press Space
         keyboard.press(Key.space)
         keyboard.release(Key.space)
     elif command == 'he': # Hold E
         keyboard.press('e')
     elif command == 're': # Release E
-        keyboard.release('re')
+        keyboard.release('e')
     elif command == 'q': # Press Q
         keyboard.press('q')
         keyboard.release('q')
@@ -171,6 +179,17 @@ def ParseCommand(message):
     elif command == 'enter': # Press Enter
         keyboard.press(Key.enter)
         keyboard.release(Key.enter)
+    elif command == 'reset_buttons': # Resets on Held Buttons
+        mouse.release(Mouse.right)
+        mouse.release(Mouse.left)
+        keyboard.release('w')
+        keyboard.release('s')
+        keyboard.release('a')
+        keyboard.release('d')
+        keyboard.release(key.alt)
+        keyboard.release('e')
+        keyboard.release(Key.shift_l)
+        keyboard.release(Key.alt)
     elif command == 'moo': #Test Command
         print('Said The Blue Cow')
     else:
@@ -182,7 +201,6 @@ def main(argv):
     nickname = 'InputBoi'
     token = os.environ.get('twitch_token')
     channel = ''
-
     try:
         opts, args = getopt.getopt(argv, "hc:",["channel="])
     except getopt.GetoptError:
@@ -196,7 +214,6 @@ def main(argv):
             channel = '#' + arg
 
     print('Connection to channel ' + channel)
-    sock = socket.socket()
     sock.connect((server, port))
     print('Connected!')
 
@@ -219,7 +236,7 @@ def main(argv):
                 if fmtre is not None:
                     username, channel, message = fmtre.groups()
                     # print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
-                    ParseCommand(message)
+                    ParseCommand(message,channel)
     except KeyboardInterrupt:
         sock.close()
         print('Socket Closed')
