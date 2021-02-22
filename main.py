@@ -8,7 +8,12 @@ from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
 # from you import YourMom as PogChamp
 
-
+mouse = MouseController()
+keyboard = KeyboardController()
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(message)s',
+                    datefmt='%Y-%m-%d_%H:%M:%S',
+                    handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
 
 def ParseCommand(message):
     message = message.replace('\r', '')
@@ -27,6 +32,14 @@ def ParseCommand(message):
         mouse.press(Button.left)
     elif message == 'rlm': # Release Left Mouse
         mouse.release(Button.left)
+    elif message == 'mup':
+        mouse.move(0,-60)
+    elif message == 'mdown':
+        mouse.move(0,60)
+    elif message == 'mleft':
+        mouse.move(-60, 0)
+    elif message == 'mright':
+        mouse.move(60,0)
     elif message == 'halt': # Hold Alt
         keyboard.press(Key.alt)
     elif message == 'ralt': # Release Alt
@@ -128,14 +141,8 @@ def main(argv):
     server = 'irc.chat.twitch.tv'
     port = 6667
     nickname = 'InputBoi'
-    token = os.getenv('twitch_token')
+    token = os.environ.get('twitch_token')
     channel = ''
-    mouse = MouseController()
-    keyboard = KeyboardController()
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s - %(message)s',
-                        datefmt='%Y-%m-%d_%H:%M:%S',
-                        handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
 
     try:
         opts, args = getopt.getopt(argv, "hc:",["channel="])
