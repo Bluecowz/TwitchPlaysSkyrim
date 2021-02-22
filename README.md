@@ -69,5 +69,6 @@ This formatting of commands might be confusing at first and feedback on how to i
 
 # Yup
 
-I think thats it.
+Skyrim Controls can be found here: https://elderscrolls.fandom.com/wiki/Controls_(Skyrim)
 
+I think thats it. 
