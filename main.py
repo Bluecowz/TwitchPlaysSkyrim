@@ -10,9 +10,7 @@ from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController, Listener
 
 ### TODOS
-# TODO Fix the damn mouse input
 # TODO Enum for commands 
-# TODO varaible mouse movement?
 # TODO logging 
 # TODO Filter none command messages
 # TODO Remove magic numbers for mouse
