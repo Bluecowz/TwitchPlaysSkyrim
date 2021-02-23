@@ -10,7 +10,13 @@ from enum import Enum
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController, Listener
 
+### NOTES
+# Disable alt-tab so you can't leave the game
+# Can I lock the game?
+
+
 ### TODOS
+# TODO mleft0*1A4 broke it 
 # TODO mouse to lmb and rmb
 # TODO can something be down about the mouse snap?
 # TODO F5 is broken from regex
