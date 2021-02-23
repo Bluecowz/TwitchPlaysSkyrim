@@ -39,7 +39,7 @@ class Commands(Enum):
     HOLD_E='he'
     RELEASE_E='re'
     PRESS_Q='q'
-    ESC='esc'
+    # ESC='esc'
     F5='f5'
     UP_ARROW='up'
     DOWN_ARROW='down'
