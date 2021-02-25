@@ -16,14 +16,14 @@ from pynput.mouse import Button, Controller as MouseController, Listener
 
 
 ### TODOS
+# TODO Replace ELIF with tuples and better commands 
 # TODO mleft0*1A4 broke it 
 # TODO mouse to lmb and rmb
 # TODO can something be down about the mouse snap?
 # TODO F5 is broken from regex
 # TODO Limit mouse move size
 # TODO Mouse key is broken?
-# TODO Better logging, breaking and now knowing 
-# TODO Replace ELIF with tuples and better commands 
+# TODO Better logging, breaking and not knowing 
 # TODO Have long and short versions for commands
 ###
 
