@@ -18,12 +18,12 @@ Mouse movements can be give an arguement for how far to move. The mouse movement
 
 | Command | What You Want To Do |
 | --- | --- |
-| rm | Click Right Mouse Button |
-| hrm | Hold Right Mouse Button |
-| rrm | Release Right Mouse Button |
-| lm | Click Left Mouse Button |
-| hlm | Hold Left Mouse Button |
-| rlm | Release Left Mouse Button |
+| rmb | Click Right Mouse Button |
+| hrmb | Hold Right Mouse Button |
+| rrmb | Release Right Mouse Button |
+| lmb | Click Left Mouse Button |
+| hlmb | Hold Left Mouse Button |
+| rlmb | Release Left Mouse Button |
 | mup | Move The Mouse Up |
 | mupX | Move The Mouse Up X pixels. Ex: mup600 |
 | mdown | Move The Mouse Down |
@@ -62,7 +62,7 @@ Mouse movements can be give an arguement for how far to move. The mouse movement
 | re | Release E |
 | q | Press Q |
 | esc | Press Esc (Removed but might add it back) |
-| f5 | Press F5 |
+| save | Press F5 |
 | up | Press Up Arrow |
 | down | Press Down Arrow |
 | left | Press Left Arrow |
