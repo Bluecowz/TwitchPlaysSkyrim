@@ -15,13 +15,8 @@ from pynput.mouse import Button, Controller as MouseController, Listener
 
 
 ### TODOS
-# TODO Replace ELIF with tuples and better commands 
-# TODO mleft0*1A4 broke it 
-# TODO mouse to lmb and rmb
+
 # TODO can something be down about the mouse snap?
-# TODO F5 is broken from regex
-# TODO Limit mouse move size
-# TODO Mouse key is broken?
 # TODO Better logging, breaking and not knowing 
 # TODO Have long and short versions for commands
 ###
@@ -39,43 +34,39 @@ def press_key(key):
     keyboard.press(key)
     keyboard.release(key)
 
-def click_right():
-    mouse.press(Button.right)
+def click(key):
+    mouse.press(key)
     time.sleep(0.3)
-    mouse.release(Button.right)
+    mouse.release(k)
 
-def click_left():
-    mouse.press(Button.left)
-    time.sleep(0.3)
-    mouse.release(Button.left)
-
-def mouse_up(y):
-    mouse.position = (1,1)
-    if value != '':
-        mouse.move(0,-int(value))
-    else:
-        mouse.move(0,-MOUSE_STEP)
 
 def mouse_down(y):
     mouse.position = (1,1)
-    if value != '':
-        mouse.move(0,int(value))
+    if y != '' && y > 0 && y <= 3000:
+        mouse.move(0,int(y))
     else:
         mouse.move(0,MOUSE_STEP)
 
-def mouse_left(x):
+def mouse_up(y):
     mouse.position = (1,1)
-    if value != '':
-        mouse.move(-int(value), 0)
+    if y != '' && y > 0 && y <= 3000:
+        mouse.move(0,-int(y))
     else:
-        mouse.move(-MOUSE_STEP, 0)
+        mouse.move(0,-MOUSE_STEP)
 
 def mouse_right(x):
     mouse.position = (1,1)
-    if value != '':
-        mouse.move(int(value), 0)
+    if x != '' && x > 0 && x <= 4000:
+        mouse.move(int(x), 0)
     else:    
         mouse.move(MOUSE_STEP,0)
+
+def mouse_left(x):
+    mouse.position = (1,1)
+    if x != '' && x > 0 && x <= 4000:
+        mouse.move(-int(x), 0)
+    else:
+        mouse.move(-MOUSE_STEP, 0)
 
 def reset_buttons():
     mouse.release(Mouse.right)
@@ -93,10 +84,10 @@ def on_move(x,y):
 
 commands = [
     # (command, function)
-    ('rmb', click_right),
+    ('rmb', lambda: click(Button.right)),
     ('hrmb', lambda: mouse.press(Button.right)),
     ('rrmb', lambda: mouse.release(Button.right)),
-    ('lmb', click_left),
+    ('lmb', lambda: click(Button.left)),
     ('hlmb', lambda: mouse.press(Button.left)),
     ('rlmb', lambda: mouse.release(Button.left)),
     ('mup', mouse_up),
@@ -133,7 +124,7 @@ commands = [
     ('re', lambda: keyboard.release('e')),
     ('q', lambda: press_key('q')),
     ('esc', lambda: press_key(Key.esc)),
-    ('f5', lambda: press_key(Key.f5)),
+    ('save', lambda: press_key(Key.f5)), # Instead of F5 because parsing problems
     ('up', lambda: press_key(Key.up)),
     ('down', lambda: press_key(Key.down)),
     ('left', lambda: press_key(Key.left)),
@@ -142,7 +133,7 @@ commands = [
     ('rshift', lambda: keyboard.release(Key.shift_l)),
     ('enter', lambda: press_key(Key.enter)),
     ('reset_buttons', reset_buttons),
-    ('moo', lambda: print('Said The Blue Cow')),
+    ('moo', lambda: logging.log('Said the blue cow')),
 ]
 
 def main(argv):
@@ -193,20 +184,23 @@ def main(argv):
                         command, value = msg.groups()
                         for c in commands:
                             if command == c[0]:
-                                c[1]() if value != None else c[1](value) 
                                 logging.debug("{}:{}:{}:{}".format(channel,username,command,value))
+                                if value == '':
+                                    c[1]()
+                                else:
+                                    c[1](value)
                                 break
                             
 
     except KeyboardInterrupt:
         sock.close()
-
+        logging.exception('It was you and you know it')
         print('Socket Closed')
     except ConnectionError:
         sock.close()
-        print('Connection Error')
-    except Exception:
-        logging.error('Fuck: ' + Exception.msg)
+        logging.exception('Probably Twitch...')
+    except Exception as e:
+        logging.exception('Fuck')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
