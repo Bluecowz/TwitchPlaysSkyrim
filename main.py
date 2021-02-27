@@ -15,9 +15,8 @@ from pynput.mouse import Button, Controller as MouseController, Listener
 
 
 ### TODOS
-
+# TODO fix alt tab with listener
 # TODO can something be down about the mouse snap?
-# TODO Better logging, breaking and not knowing 
 # TODO Have long and short versions for commands
 ###
 
@@ -39,38 +38,37 @@ def click(key):
     time.sleep(0.3)
     mouse.release(k)
 
-
-def mouse_down(y):
+def mouse_down(y=''):
     mouse.position = (1,1)
-    if y != '' and y > 0 and y <= 3000:
-        mouse.move(0,int(y))
-    else:
+    if y == '':
         mouse.move(0,MOUSE_STEP)
-
-def mouse_up(y):
+    elif y > 0 and y <= 3000:
+        mouse.move(0,int(y))
+        
+def mouse_up(y=''):
     mouse.position = (1,1)
-    if y != '' and y > 0 and y <= 3000:
-        mouse.move(0,-int(y))
-    else:
+    if y == '':
         mouse.move(0,-MOUSE_STEP)
+    elif y > 0 and y <= 3000:
+        mouse.move(0,-int(y))
 
-def mouse_right(x):
+def mouse_right(x=''):
     mouse.position = (1,1)
-    if x != '' and x > 0 and x <= 4000:
-        mouse.move(int(x), 0)
-    else:    
+    if x == '':
         mouse.move(MOUSE_STEP,0)
+    elif x > 0 and x <= 4000:
+        mouse.move(int(x), 0)
 
-def mouse_left(x):
+def mouse_left(x=''):
     mouse.position = (1,1)
-    if x != '' and x > 0 and x <= 4000:
-        mouse.move(-int(x), 0)
-    else:
+    if x == '':
         mouse.move(-MOUSE_STEP, 0)
-
+    elif x > 0 and x <= 4000:
+        mouse.move(-int(x), 0)
+        
 def reset_buttons():
-    mouse.release(Mouse.right)
-    mouse.release(Mouse.left)
+    mouse.release(Button.right)
+    mouse.release(Button.left)
     keyboard.release('w')
     keyboard.release('s')
     keyboard.release('a')
@@ -132,7 +130,7 @@ commands = [
     ('hshift', lambda: keyboard.press(Key.shift_l)),
     ('rshift', lambda: keyboard.release(Key.shift_l)),
     ('enter', lambda: press_key(Key.enter)),
-    ('reset_buttons', reset_buttons),
+    ('release', reset_buttons),
     ('moo', lambda: logging.log('Said the blue cow')),
 ]
 
@@ -179,9 +177,10 @@ def main(argv):
                     username, channel, message = fmtre.groups()    
                     message = message.replace('\r', '')
                     # print(f"Channel: {channel} \nUsername: {username} \nMessage: {message}")
-                    msg = re.search('([a-zA-Z_]+)[ ]?([0-9]*)',message)
+                    msg = re.search('^([a-zA-Z_]+)[ ]?([0-9]*)$',message)
                     if msg != None:
                         command, value = msg.groups()
+                        value = int(value) if value != '' else value
                         for c in commands:
                             if command == c[0]:
                                 logging.debug("{}:{}:{}:{}".format(channel,username,command,value))
