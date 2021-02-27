@@ -32,9 +32,11 @@ logging.basicConfig(level=logging.DEBUG,
 # Tab is a special case because I don't want people alt tabbing out the game
 # Cealsha this means you
 def press_tab():
+    keyboard.release(Key.shift_l)
     keyboard.release(Key.alt)
     time.sleep(0.3)
     press_key(Key.tab)
+
 
 def press_key(key):
     keyboard.press(key)
