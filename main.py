@@ -6,8 +6,8 @@ import getopt
 import os
 import time
 from enum import Enum
-from pynput.keyboard import Key, Controller as KeyboardController
-from pynput.mouse import Button, Controller as MouseController, Listener
+from pynput.keyboard import Key, Controller as KeyboardController, Listener as KListener
+from pynput.mouse import Button, Controller as MouseController, Listener as MListener
 
 ### NOTES
 # Disable alt-tab so you can't leave the game
@@ -29,8 +29,16 @@ logging.basicConfig(level=logging.DEBUG,
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.FileHandler('chat.log', encoding='utf-8')])
 
+# Tab is a special case because I don't want people alt tabbing out the game
+# Cealsha this means you
+def press_tab():
+    keyboard.release(Key.alt)
+    time.sleep(0.3)
+    press_key(Key.tab)
+
 def press_key(key):
     keyboard.press(key)
+    #time.sleep(0.3)
     keyboard.release(key)
 
 def click(key):
@@ -77,8 +85,20 @@ def reset_buttons():
     keyboard.release(Key.shift_l)
     keyboard.release(Key.alt)
 
+# This was for debugging
 def on_move(x,y):
-    print("print('Pointer moved to {0}".format((x,y)))
+    pass
+    #print("print('Pointer moved to {0}".format((x,y)))
+
+def on_release(key):
+    print('Released: ' + key.char)
+    if key == Key.alt:
+        alt_down=false
+
+def on_press(key):
+    print('Presssed: ' + key.char)
+    if key == Key.alt:
+        alt_down=true
 
 commands = [
     # (command, function)
@@ -113,7 +133,7 @@ commands = [
     ('t', lambda: press_key('t')),
     ('j', lambda: press_key('j')),
     ('e', lambda: press_key('e')),
-    ('tab', lambda: press_key(Key.tab)),
+    ('tab', press_tab),
     ('r', lambda: press_key('r')),
     ('l', lambda: press_key('l')),
     ('m', lambda: press_key('m')),
@@ -161,8 +181,9 @@ def main(argv):
     sock.send(f"NICK {nickname}\n".encode('utf-8'))
     sock.send(f"JOIN {channel}\n".encode('utf-8'))
 
-    listener = Listener(on_move=on_move)
-    # listener.start()
+    listener = KListener(on_press=on_press,
+                        on_release=on_release)
+    #listener.start()
 
     try:
         print('Beginning command parsing...')
