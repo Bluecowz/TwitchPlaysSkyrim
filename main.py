@@ -12,7 +12,7 @@ from pynput.keyboard import Key, Controller as KeyboardController, Listener as K
 from pynput.mouse import Button, Controller as MouseController, Listener as MListener
 
 ### TODOS
-# TODO fix alt tab with listener
+# TODO recover after crash
 # TODO can something be down about the mouse snap?
 # TODO Have long and short versions for commands
 ###
@@ -30,9 +30,11 @@ logging.basicConfig(level=logging.DEBUG,
 # Tab is a special case because I don't want people alt tabbing out the game
 # Cealsha this means you
 def press_tab():
+    keyboard.release(Key.shift_l)
     keyboard.release(Key.alt)
     time.sleep(0.3)
     press_key(Key.tab)
+
 
 def press_key(key):
     keyboard.press(key)
@@ -94,9 +96,11 @@ def on_release(key):
         alt_down=false
 
 def on_press(key):
-    print('Presssed: ' + key.char)
-    if key == Key.alt:
-        alt_down=true
+    if key == Key.F1:
+        sock.close()
+        logging.info("F1 Pressed. Exiting")
+        print("F1 Pressed. Exiting")
+        sys.exit()
 
 def command_runner():
     while True:
