@@ -5,22 +5,19 @@ import sys
 import getopt
 import os
 import time
+from queue import Queue
+from threading import Thread
 from enum import Enum
 from pynput.keyboard import Key, Controller as KeyboardController, Listener as KListener
 from pynput.mouse import Button, Controller as MouseController, Listener as MListener
-
-### NOTES
-# Disable alt-tab so you can't leave the game
-# Can I lock the game?
-
 
 ### TODOS
 # TODO fix alt tab with listener
 # TODO can something be down about the mouse snap?
 # TODO Have long and short versions for commands
-# TODO Implement queue system for commands 
 ###
 
+command_queue=Queue()
 MOUSE_STEP=100
 sock = socket.socket()
 mouse = MouseController()
@@ -101,6 +98,24 @@ def on_press(key):
     if key == Key.alt:
         alt_down=true
 
+def command_runner():
+    while True:
+        if command_queue.qsize() != 0:
+            #command: (name, function, value)
+            c =         command_queue.get()
+            name=       c[0]
+            function=   c[1]
+            value=      c[2]
+
+            logging.debug("Executed {}:{}".format(name, value))
+            if value == '':
+                function()
+            else:
+                function(value)
+        else:
+            pass
+            
+# skyrim command list 
 commands = [
     # (command, function)
     ('rmb', lambda: click(Button.right)),
@@ -183,6 +198,9 @@ def main(argv):
     listener = KListener(on_press=on_press,
                         on_release=on_release)
     #listener.start()
+    executor = Thread(target=command_runner)
+    executor.start()
+    print('Started command execute thread...')
     print('Beginning command parsing...')
     while True:
         try:
@@ -204,16 +222,13 @@ def main(argv):
                         value = int(value) if value != '' else value
                         for c in commands:
                             if command == c[0]:
-                                logging.debug("{}:{}:{}:{}".format(channel,username,command,value))
-                                if value == '':
-                                    c[1]()
-                                else:
-                                    c[1](value)
-                                break
+                                logging.debug("Added To Queue:{}:{}:{}:{}".format(channel,username,command,value))
+                                command_queue.put((c[0],c[1],value))
         except KeyboardInterrupt:
             sock.close()
+            executor.join()
             logging.exception('It was you and you know it')
-            print('Socket Closed! Exiting...')
+            print('Stopping Everything. Exiting...')
             sys.exit()
         except ConnectionError:
             sock.close()
