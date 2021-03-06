@@ -18,6 +18,7 @@ from pynput.mouse import Button, Controller as MouseController, Listener as MLis
 # TODO recover after crash
 # TODO can something be down about the mouse snap?
 # TODO Have long and short versions for commands
+# TODO Implement queue system for commands 
 ###
 
 MOUSE_STEP=100
@@ -180,22 +181,21 @@ def main(argv):
     sock.connect((server, port))
     print('Connected!')
     logging.debug('Connection Started')
-
     sock.send(f"PASS {token}\n".encode('utf-8'))
     sock.send(f"NICK {nickname}\n".encode('utf-8'))
     sock.send(f"JOIN {channel}\n".encode('utf-8'))
-
     listener = KListener(on_press=on_press,
                         on_release=on_release)
     #listener.start()
-
-    try:
-        print('Beginning command parsing...')
-        while True:
+    print('Beginning command parsing...')
+    while True:
+        try:
             resp = sock.recv(2048).decode('utf-8')
-
             if resp.startswith('PING'):
                 sock.send("PONG\n".encode('utf-8'))
+            elif 'Improperly formatted auth' in resp:
+                print('Bad Auth Key')
+                sys.exit()
             elif len(resp) > 0:
                 fmtre = re.search(':(.*)\!.*@.*\.tmi\.twitch\.tv PRIVMSG #(.*) :(.*)', resp)
                 if fmtre is not None:
@@ -214,17 +214,16 @@ def main(argv):
                                 else:
                                     c[1](value)
                                 break
-                            
-
-    except KeyboardInterrupt:
-        sock.close()
-        logging.exception('It was you and you know it')
-        print('Socket Closed')
-    except ConnectionError:
-        sock.close()
-        logging.exception('Probably Twitch...')
-    except Exception as e:
-        logging.exception('Fuck')
+        except KeyboardInterrupt:
+            sock.close()
+            logging.exception('It was you and you know it')
+            print('Socket Closed! Exiting...')
+            sys.exit()
+        except ConnectionError:
+            sock.close()
+            logging.exception('Probably Twitch...')
+        except Exception as e:
+            logging.exception('Fuck')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
