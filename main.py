@@ -15,7 +15,7 @@ from pynput.mouse import Button, Controller as MouseController, Listener as MLis
 
 
 ### TODOS
-# TODO fix alt tab with listener
+# TODO recover after crash
 # TODO can something be down about the mouse snap?
 # TODO Have long and short versions for commands
 ###
@@ -98,9 +98,11 @@ def on_release(key):
         alt_down=false
 
 def on_press(key):
-    print('Presssed: ' + key.char)
-    if key == Key.alt:
-        alt_down=true
+    if key == Key.F1:
+        sock.close()
+        logging.info("F1 Pressed. Exiting")
+        print("F1 Pressed. Exiting")
+        sys.exit()
 
 commands = [
     # (command, function)
